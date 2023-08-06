@@ -191,7 +191,6 @@ in
     ];
 
     home.file = {
-      ".config/hypr".source = dotfiles-nix/hyprland;
       ".config/nvim".source = dotfiles-nix/nvim;
       ".config/kitty/kitty.conf".source = dotfiles-nix/kitty/kitty.conf;
       ".config/fish".source = dotfiles-nix/fish;
