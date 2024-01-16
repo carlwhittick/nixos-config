@@ -34,13 +34,16 @@ set $ws7   4:2
 set $ws8   4:3
 set $ws9   4:4
 
+
+exec sleep 5; systemctl --user start kanshi.service
+exec dbus-sway-environment
+exec configure-gtk
+
 # Prevent slow waybar start
 exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
 
 # Autostart
 exec wl-clipboard-history -t
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec /usr/lib/polkit-kde-authentication-agent-1
 exec dunst
 
@@ -69,7 +72,7 @@ output DP-3 pos 3840 1234 res 1920x1080
 
 # Wallpaper
 output * bg #303446 solid_color
-output * bg /home/carlw/Downloads/purple-night-ride-4k-qz.jpg fill
+output * bg $HOME/Pictures/wallpapers/purple-night-ride-4k-qz.jpg fill
 
 # output HDMI-1 resolution 3840x2160 position 1782,0 scale 1.75
 # output DP-1 resolution 1920x1080 position 0,1234 scale 1

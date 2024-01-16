@@ -4,6 +4,30 @@
 
 { config, pkgs, ... }:
 let
+  dbus-sway-environment = pkgs.writeTextFile {
+    name = "dbus-sway-environment";
+    destination = "/bin/dbus-sway-environment";
+    executable = true;
+
+    text = ''
+      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+      systemctl --user stop pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
+      systemctl --user start pipewire pipewire-media-session xdg-desktop-portal xdg-desktop-portal-wlr
+    '';
+  };
+  configure-gtk = pkgs.writeTextFile {
+    name = "configure-gtk";
+    destination = "/bin/configure-gtk";
+    executable = true;
+    text = let
+      schema = pkgs.gsettings-desktop-schemas;
+      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
+    in ''
+      export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
+      gnome_schema=org.gnome.desktop.interface
+      gsettings set $gnome_schema gtk-theme 'Dracula'
+    '';
+  };
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz";
   nix-software-center = import (pkgs.fetchFromGitHub {
     owner = "vlinkz";
@@ -33,8 +57,14 @@ in
   boot.loader.grub.useOSProber = true;
   boot.initrd = {
     # supportedFilesystems = [ "nfs" ];
-    kernelModules = [ "amdgpu" ];
+    kernelModules = [
+      "amdgpu"
+      # "v4l2loopback"
+    ];
   };
+  boot.kernelModules = [
+    "v4l2loopback"
+  ];
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -65,10 +95,10 @@ in
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = false;
+  services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
 
   # Configure keymap in X11
@@ -100,6 +130,15 @@ in
     #media-session.enable = true;
   };
 
+  services.dbus.enable = true;
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    # gtk portal needed to make gtk apps happy
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+  
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -108,6 +147,24 @@ in
     tmux
     swayidle
     nfs-utils
+
+    dbus-sway-environment
+    configure-gtk
+    wayland
+    xdg-utils # for opening default programs when clicking links
+    glib # gsettings
+    dracula-theme # gtk theme
+    gnome3.adwaita-icon-theme  # default gnome cursors
+    swaylock
+    swayidle
+    wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
+    wdisplays # tool to configure displays
+
+    # Webcam
+    gphoto2
+    v4l-utils
+    # v4l2loopback-dkms
+    ffmpeg
   ];
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -135,7 +192,7 @@ in
       kitty
       remmina
       dolphin
-      obsidian
+      # obsidian
       
       # Desktop Environment
       hyprpaper
@@ -159,6 +216,7 @@ in
       cinnamon.nemo-with-extensions
       usbutils
       gthumb # Image Viewer
+      hyprpicker
 
       # CLI
       lazygit
@@ -185,13 +243,22 @@ in
       encfs
       bitwarden
       bitwarden-cli
+      gnome.file-roller
+      signal-desktop
+
+      # Games
+      clonehero
+      steam-tui
 
       # Fonts
       (pkgs.nerdfonts.override { fonts = [ "SourceCodePro" ]; })
     ];
 
     home.file = {
-      ".config/nvim".source = dotfiles-nix/nvim;
+      ".config/nvim" = {
+        "source" = dotfiles-nix/nvim;
+        "recursive" = true;
+      };
       ".config/kitty/kitty.conf".source = dotfiles-nix/kitty/kitty.conf;
       ".config/fish".source = dotfiles-nix/fish;
       ".config/waybar".source = dotfiles-nix/waybar;
@@ -199,6 +266,7 @@ in
       ".config/sway".source = dotfiles-nix/sway;
       ".config/sov".source = dotfiles-nix/sov;
       ".config/swaylock".source = dotfiles-nix/swaylock;
+      "Pictures/wallpapers".source = dotfiles-nix/wallpapers;
     };
 
     home.sessionVariables = {
@@ -318,9 +386,7 @@ in
 
   programs.sway = {
     enable = true;
-    extraSessionCommands = ''
-      # waybar
-    '';
+    wrapperFeatures.gtk = true;
   };
 
   # Thumbnails
