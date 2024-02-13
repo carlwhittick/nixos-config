@@ -99,7 +99,7 @@ in
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.displayManager.defaultSession = "sway";
 
   # Configure keymap in X11
   # services.xserver = {
@@ -137,7 +137,6 @@ in
     # gtk portal needed to make gtk apps happy
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
-  
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -192,7 +191,7 @@ in
       kitty
       remmina
       dolphin
-      # obsidian
+      obsidian
       
       # Desktop Environment
       hyprpaper
@@ -228,7 +227,6 @@ in
       htop # System monitor
       tree-sitter
       fd # Find cli alternative
-      zig # Compiler for zig and c/c++
       ncspot # Spotify in terminal
 
       keeweb
@@ -245,6 +243,7 @@ in
       bitwarden-cli
       gnome.file-roller
       signal-desktop
+      discord
 
       # Games
       clonehero
@@ -252,13 +251,14 @@ in
 
       # Fonts
       (pkgs.nerdfonts.override { fonts = [ "SourceCodePro" ]; })
+
+      # Code
+      go
+      zig # Compiler for zig and c/c++
     ];
 
     home.file = {
-      ".config/nvim" = {
-        "source" = dotfiles-nix/nvim;
-        "recursive" = true;
-      };
+      ".config/nvim".source = dotfiles-nix/nvim;
       ".config/kitty/kitty.conf".source = dotfiles-nix/kitty/kitty.conf;
       ".config/fish".source = dotfiles-nix/fish;
       ".config/waybar".source = dotfiles-nix/waybar;
@@ -333,6 +333,9 @@ in
     config = {
       allowUnfree = true;
       allowUnfreePredicate = (_: true);
+      permittedInsecurePackages = [
+        "electron-24.8.6"
+      ];
     };
   };
 
