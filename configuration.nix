@@ -19,28 +19,34 @@ let
     name = "configure-gtk";
     destination = "/bin/configure-gtk";
     executable = true;
-    text = let
-      schema = pkgs.gsettings-desktop-schemas;
-      datadir = "${schema}/share/gsettings-schemas/${schema.name}";
-    in ''
-      export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
-      gnome_schema=org.gnome.desktop.interface
-      gsettings set $gnome_schema gtk-theme 'Dracula'
-    '';
+    text =
+      let
+        schema = pkgs.gsettings-desktop-schemas;
+        datadir = "${schema}/share/gsettings-schemas/${schema.name}";
+      in
+      ''
+        export XDG_DATA_DIRS=${datadir}:$XDG_DATA_DIRS
+        gnome_schema=org.gnome.desktop.interface
+        gsettings set $gnome_schema gtk-theme 'Dracula'
+      '';
   };
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz";
-  nix-software-center = import (pkgs.fetchFromGitHub {
-    owner = "vlinkz";
-    repo = "nix-software-center";
-    rev = "0.1.2";
-    sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
-  }) {};
+  # home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-23.11.tar.gz";
+  nix-software-center = import
+    (pkgs.fetchFromGitHub {
+      owner = "vlinkz";
+      repo = "nix-software-center";
+      rev = "0.1.2";
+      sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
+    })
+    { };
 in
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      (import "${home-manager}/nixos")
+      # (import "${home-manager}/nixos")
+      <home-manager/nixos>
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -141,8 +147,8 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
     tmux
     swayidle
     nfs-utils
@@ -153,7 +159,7 @@ in
     xdg-utils # for opening default programs when clicking links
     glib # gsettings
     dracula-theme # gtk theme
-    gnome3.adwaita-icon-theme  # default gnome cursors
+    gnome3.adwaita-icon-theme # default gnome cursors
     swaylock
     swayidle
     wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
@@ -183,7 +189,7 @@ in
     home.username = "carlw";
     home.homeDirectory = "/home/carlw";
 
-    home.stateVersion = "23.05";
+    home.stateVersion = "23.11";
 
     home.packages = with pkgs; [
       firefox
@@ -191,8 +197,8 @@ in
       kitty
       remmina
       dolphin
-      obsidian
-      
+      # obsidian
+
       # Desktop Environment
       hyprpaper
       waybar # Main toolbars
@@ -204,7 +210,7 @@ in
       pkgs.wl-clipboard # Clipboard
       # xdg-desktop-portal-hyprland
       xdg-desktop-portal-wlr
-      hyprland-share-picker
+      # hyprland-share-picker
       whatsapp-for-linux
       sway-contrib.grimshot # Screenshots
       dunst # Notification daemon
@@ -222,7 +228,7 @@ in
       lazydocker
       fzf # Fuzzy finder
       bat # Better cat
-      exa # Better ls
+      eza # Better ls
       ripgrep # Better grep
       htop # System monitor
       tree-sitter
@@ -244,6 +250,8 @@ in
       gnome.file-roller
       signal-desktop
       discord
+      yazi
+      zoxide
 
       # Games
       clonehero
@@ -255,6 +263,9 @@ in
       # Code
       go
       zig # Compiler for zig and c/c++
+      rustc
+      cargo
+      gcc
     ];
 
     home.file = {
@@ -312,7 +323,7 @@ in
         package = pkgs.papirus-icon-theme;
       };
 
-# capitaine-cursors-themed
+      # capitaine-cursors-themed
 
       gtk3.extraConfig = {
         Settings = ''
@@ -348,7 +359,7 @@ in
   };
 
   virtualisation.virtualbox.host.enable = true;
-  users.extraGroups.vboxusers.members = ["carlw"];
+  users.extraGroups.vboxusers.members = [ "carlw" ];
 
   # fileSystems."/mnt/media" = {
   #   device = "192.168.1.224:/media";
@@ -356,7 +367,7 @@ in
   #   # options = [ "user" "users" ];
   #   options = [ "x-systemd.automount" "noauto" ];
   # };
-  
+
   # fileSystems."/mnt/other" = {
   #   device = "192.168.1.224:/export/media";
   #   fsType = "nfs";
@@ -375,8 +386,8 @@ in
   programs.neovim = {
     enable = true;
     defaultEditor = true;
-    viAlias=true;
-    vimAlias=true;
+    viAlias = true;
+    vimAlias = true;
   };
 
   programs.fish = {
@@ -423,6 +434,8 @@ in
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  system.autoUpgrade.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

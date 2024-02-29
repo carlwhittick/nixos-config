@@ -56,6 +56,8 @@ set -g fish_pager_color_prefix f5c2e7
 set -g fish_pager_color_completion cdd6f4
 set -g fish_pager_color_description 6c7086
 
+zoxide init fish | source
+
 function cat
     bat $argv
 end
