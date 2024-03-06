@@ -46,7 +46,7 @@ in
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
       # (import "${home-manager}/nixos")
-      <home-manager/nixos>
+      # <home-manager/nixos>
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -72,7 +72,7 @@ in
     "v4l2loopback"
   ];
 
-  networking.hostName = "my-nixos"; # Define your hostname.
+  networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -183,160 +183,6 @@ in
     description = "Carl Whittick";
     extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.fish;
-  };
-
-  home-manager.users.carlw = {
-    home.username = "carlw";
-    home.homeDirectory = "/home/carlw";
-
-    home.stateVersion = "23.11";
-
-    home.packages = with pkgs; [
-      firefox
-      chromium
-      kitty
-      remmina
-      dolphin
-      # obsidian
-
-      # Desktop Environment
-      hyprpaper
-      waybar # Main toolbars
-      swaylock-effects # Lock screen
-      nwg-drawer
-      nwg-launchers
-      polkit-kde-agent # Authentication agent
-      pkgs.xclip # Clipboard
-      pkgs.wl-clipboard # Clipboard
-      # xdg-desktop-portal-hyprland
-      xdg-desktop-portal-wlr
-      # hyprland-share-picker
-      whatsapp-for-linux
-      sway-contrib.grimshot # Screenshots
-      dunst # Notification daemon
-      fuzzel # Quick application runner
-      swaybg # Wallpapers
-      sov # Sway overview
-      wob # Graphical indicator (volume/brightness/etc)
-      cinnamon.nemo-with-extensions
-      usbutils
-      gthumb # Image Viewer
-      hyprpicker
-
-      # CLI
-      lazygit
-      lazydocker
-      fzf # Fuzzy finder
-      bat # Better cat
-      eza # Better ls
-      ripgrep # Better grep
-      htop # System monitor
-      tree-sitter
-      fd # Find cli alternative
-      ncspot # Spotify in terminal
-
-      keeweb
-      mullvad-vpn
-      qbittorrent
-      haruna
-      arduino
-      arduino-cli
-      gparted
-      nix-software-center
-      # gencfsm # gnome-encfs-manager
-      encfs
-      bitwarden
-      bitwarden-cli
-      gnome.file-roller
-      signal-desktop
-      discord
-      yazi
-      zoxide
-
-      # Games
-      clonehero
-      steam-tui
-
-      # Fonts
-      (pkgs.nerdfonts.override { fonts = [ "SourceCodePro" ]; })
-
-      # Code
-      go
-      zig # Compiler for zig and c/c++
-      rustc
-      cargo
-      gcc
-    ];
-
-    home.file = {
-      ".config/nvim".source = dotfiles-nix/nvim;
-      ".config/kitty/kitty.conf".source = dotfiles-nix/kitty/kitty.conf;
-      ".config/fish".source = dotfiles-nix/fish;
-      ".config/waybar".source = dotfiles-nix/waybar;
-      ".config/dunst".source = dotfiles-nix/dunst;
-      ".config/sway".source = dotfiles-nix/sway;
-      ".config/sov".source = dotfiles-nix/sov;
-      ".config/swaylock".source = dotfiles-nix/swaylock;
-      "Pictures/wallpapers".source = dotfiles-nix/wallpapers;
-    };
-
-    home.sessionVariables = {
-      EDITOR = "nvim";
-      _JAVA_AWT_WM_NONREPARENTING = "1";
-    };
-
-    home.pointerCursor = {
-      gtk.enable = true;
-      package = pkgs.vimix-gtk-themes;
-      name = "Layan-cursors";
-      size = 32;
-    };
-
-    gtk = {
-      enable = true;
-      font.name = "TeX Gyre Adventor 10";
-
-      # cursorTheme = {
-      #   package = pkgs.vimix-gtk-themes;
-      #   name = "Layan-cursors";
-      # };
-      # theme = {
-      #   name = "Juno-palenight";
-      #   package = pkgs.juno-theme;
-      # };
-      # theme = {
-      #   name = "palenight";
-      #   package = pkgs.palenight-theme;
-      # };
-      # theme = {
-      #   name = "Catppuccin-Frappe-Standard-Blue-Dark";
-      #   package = pkgs.catppuccin-gtk.override {
-      #     accents = [ "pink" ];
-      #     size = "compact";
-      #     tweaks = [ "rimless" "black" ];
-      #     variant = "macchiato";
-      #   };
-      # };
-
-      iconTheme = {
-        name = "Papirus-Dark";
-        package = pkgs.papirus-icon-theme;
-      };
-
-      # capitaine-cursors-themed
-
-      gtk3.extraConfig = {
-        Settings = ''
-          gtk-application-prefer-dark-theme=1
-        '';
-      };
-
-      gtk4.extraConfig = {
-        Settings = ''
-          gtk-application-prefer-dark-theme=1
-        '';
-      };
-    };
   };
 
   # Allow unfree packages
